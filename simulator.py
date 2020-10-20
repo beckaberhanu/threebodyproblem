@@ -1,7 +1,7 @@
 from planet import Planet
 from vector import Vector
 import json
-import turtle
+from turtle import Turtle, Screen
 import random
 import datetime
 import matplotlib.pyplot as plt
@@ -125,7 +125,7 @@ def simulateMotion(bodies, timeStep, timeRange, notifyProgEveryXSec=None):
                 # print(time*timeStep/timeRange, 'percent complete')
                 untilNotif = 0
                 
-                print(calculateEnergy(bodies,-1))
+                print(calculateEnergy(bodies,-2))
 
         untilNotif += timeStep
 
@@ -149,7 +149,7 @@ def simulateSemiImplicitMotion(bodies, timeStep, timeRange, notifyProgEveryXSec=
                 # print(time*timeStep/timeRange, 'percent complete')
                 untilNotif = 0
                 
-                print(calculateEnergy(bodies,-1))
+                print(calculateEnergy(bodies,-2))
 
         untilNotif += timeStep
 
@@ -189,14 +189,19 @@ def simulateImprovedMotion(bodies, timeStep, timeRange, notifyProgEveryXSec=None
         untilNotif += timeStep
 
 
-def drawPaths(bodies, turtles, skip):
+def drawPaths(bodies, skip):
+    bounds = getBounds(bodies)
+    win = Screen()
+    win.setworldcoordinates(bounds[0]-0.05*(bounds[3]-bounds[0]), bounds[1]-0.05*(bounds[4]-bounds[1]), bounds[3]+0.05*(bounds[3]-bounds[0]), bounds[4]+0.05*(bounds[4]-bounds[1]))
+
+    turtles = [Turtle() for body in bodies]
     numTimeSteps = len(bodies[0].getHistory()['position'])
     colors = ["red", "green", "blue", "black", "purple", "pink"]
 
     for (index, turtle) in enumerate(turtles):
         color = colors[index]
         turtle.fillcolor(color)
-        turtle.speed(10)
+        turtle.speed(0)
         turtle.pencolor(color)
 
     for time in range(0, numTimeSteps, skip):
@@ -210,6 +215,7 @@ def drawPaths(bodies, turtles, skip):
                 body.getHistory()['position'][time].toList()[0:2])
             if time == 0:
                 turtles[index].down()
+    win.exitonclick()
 
 def downSampleList(listIn, every):
     out = []
@@ -291,69 +297,15 @@ def getBounds(bodies):
 if __name__ == "__main__":
     # bodies = loadPaths("bodies1|t=0.1|l=3000.json")
     bodies = bodies2_1
-    simulateMotion(bodies, 1, 30000, 1)
-    # simulateSemiImplicitMotion(bodies, 1, 30000, 1)
+    # simulateMotion(bodies, 1, 3000, 1)
+    simulateSemiImplicitMotion(bodies, 100, 70000, 5)
     # simulateImprovedMotion(bodies, 0.1, 1000, 5)
     # savePaths(bodies, "bodies1|t=0.1|l=3000.json")
-    # print(bodies)
 
-    # win = turtle.Screen()
+    drawPaths(bodies, 500)
 
-    # # # win.setworldcoordinates(-1.5*distSunEarth, -1.5*distSunEarth,
-    # # #                         1.5*distSunEarth, 1.5*distSunEarth)
-
-    # # # win.setworldcoordinates(-0.5*distSunEarth, -1.3*distSunEarth,
-    # # #                         0.5* distSunEarth, 1.3*distSunEarth)
-
-    # # # win.setworldcoordinates(distSunEarth-5*distEarthMoon, -5*distEarthMoon,
-    # # #                         distSunEarth+5*distEarthMoon, 5*distEarthMoon)
-
-    # # # win.setworldcoordinates(distSunEarth-100*distEarthMoon, -20*distEarthMoon,
-    # # #                         distSunEarth+2*distEarthMoon, 200*distEarthMoon)
-
-    # # win.setworldcoordinates(-3000, -3000, 500, 500)
-
-    # print(getBounds(bodies))
-    # bounds = getBounds(bodies)
-
-    # win.setworldcoordinates(bounds[0]-0.05*(bounds[3]-bounds[0]), bounds[1]-0.05*(bounds[4]-bounds[1]), bounds[3]+0.05*(bounds[3]-bounds[0]), bounds[4]+0.05*(bounds[4]-bounds[1]))
-
-    # turtles = [turtle.Turtle() for body in bodies]
-
-    # # # print(bodies[2].getHistory())
-
-    # drawPaths(bodies, turtles, 50)
-
-    # win.exitonclick()
-
-    # fig = plt.figure()
-    # ax = fig.add_subplot(111, projection='3d')
-    # xpositions = []
-    # ypositions = []
-    # zpositions = []
-    # step = 5
-    # for i in bodies:
-    #     xpositions.append([])
-    #     ypositions.append([])
-    #     zpositions.append([])
-    #     history = i.getHistory()['position']
-    #     for j in range(0, len(history), step):
-    #         xpositions[-1].append(history[j].get(0))
-    #         ypositions[-1].append(history[j].get(1))
-    #         zpositions[-1].append(history[j].get(2))
-
-    # colors = ["red", "green", "blue", "pink"]
-
-    # ax.set_xlabel('X Label')
-    # ax.set_ylabel('Y Label')
-    # ax.set_zlabel('Z Label')
-
-    # for i in range(len(bodies)):
-    #     ax.scatter(xpositions[i], ypositions[i],
-    #                zpositions[i], c=colors[i], marker='o')
-    print("len", len(energyLog))
-    plt.plot(list(range(len(energyLog))),energyLog)
-    plt.show()
+    # print("len", len(energyLog))
+    # plt.plot(list(range(len(energyLog))),energyLog)
+    # plt.show()
 
     # plot3dpath(bodies, 12)
-    # print(len(xpositions))
